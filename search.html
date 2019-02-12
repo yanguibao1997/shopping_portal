@@ -515,13 +515,12 @@
             //排序字段
             search_parse.sortBy = search_parse.sortBy || '';
             //是否降序
-            search_parse.descending = search_parse.descending || false;
-
-
+            search_parse.descending = search_parse.descending == 'true' || false;
             /*for(let i in search_parse){
                 alert(i+'===>'+search_parse[i]);
             }*/
             this.search=search_parse;
+
         //    进行请求
             this.searchService();
         },
@@ -567,9 +566,22 @@
                     });
 
                     this.goodsList=res.data.items;
-
                     this.total=res.data.total;
                     this.totalPage=res.data.totalPage;
+
+
+
+                    if(this.search.descending){
+                        //    降序  选择每件商品的最大价格
+                         this.goodsList.forEach(item => {
+                             const p=Math.max.apply(null,item.price);
+                             item.skus.forEach(sku => {
+                                 if(p==sku.price){
+                                     this.goodsList.selected=item;
+                                 }
+                             });
+                         })
+                    }
                 });
             },
             index(i) {
