@@ -100,18 +100,18 @@
             <!--面包屑-->
             <ul class="fl sui-breadcrumb">
                 <li><span>全部结果:</span></li>
-                <li ><a href="#">手机</a></li>
-                <li ><span>手机通讯</span></li>
+                <li ><a href="#">{{search.key}}</a></li>
+<!--                <li ><span>手机通讯</span></li>-->
             </ul>
             <!--已选择过滤项-->
             <ul class="tags-choose">
-                <li class="tag">
-                    品牌:<span style="color: red">apple</span>
-                    <i class="sui-icon icon-tb-close"></i>
+                <li class="tag" v-for="(searchFilter,i) in search.searchFilters" :key="i" v-if="i=='brands'">
+                    {{i=='brands'?'品牌':i}}:<span style="color: red">{{i!='brands'?searchFilter:((filters.find(o => o.filter_key=='brands')).options.find(os => os.id==searchFilter)).name}}</span>
+                    <i class="sui-icon icon-tb-close" @click="remove(searchFilter,i)"></i>
                 </li>
-                <li class="tag">
-                    内存:<span style="color: red">4G</span>
-                    <i class="sui-icon icon-tb-close"></i>
+                <li class="tag" v-else>
+                    {{i=='categories'?'分类':i}}:<span style="color: red">{{searchFilter}}</span>
+                    <i class="sui-icon icon-tb-close" @click="remove(searchFilter,i)"></i>
                 </li>
             </ul>
             <div class="clearfix"></div>
@@ -192,7 +192,7 @@
                     <li class="yui3-u-1-5" v-for="goods in goodsList" :key="goods.id">
                         <div class="list-wrap">
                             <div class="p-img">
-                                <a href="item.html" target="_blank">
+                                <a :href="'/item/'+goods.id+'.html'" target="_blank">
                                     <img :src="goods.selected.images.split(',')[0]" height="200"/>
                                 </a>
                                 <ul class="skus">
@@ -212,7 +212,7 @@
                                 <em>{{goods.selected.title.length<20 ? goods.selected.title : goods.selected.title.substring(0,20)+'...'}}</em>
                             </div>
                             <div class="cu">
-                                <em><span>促</span>{{goods.subTitle.length<15 ? goods.subTitle : goods.subTitle.substring(0,15)+'...'}}</em>
+                                <em><span>促</span><span v-html="goods.subTitle.length<15 ? goods.subTitle : goods.subTitle.substring(0,15)+'...'"></span><!--{{goods.subTitle.length<15 ? goods.subTitle : goods.subTitle.substring(0,15)+'...'}}--></em>
                             </div>
                             <div class="commit">
                                 <i class="command">已有2000人评价</i>
@@ -491,7 +491,13 @@
                     option = option.name;
                 }
                 obj.searchFilters[filter_key] = option;
-
+                this.search=obj;
+            },
+            remove(searchFilter,i){
+                const obj={};
+                Object.assign(obj,this.search);
+                delete obj.searchFilters[i];
+                // console.log(obj.searchFilters);
                 this.search=obj;
             }
         }
